@@ -1,5 +1,5 @@
 # LinguisticStructureLM
-Transformer-based language modeling with symbolic linguistic structure representations. To be published at NAACL 2022.
+Transformer-based language modeling with symbolic linguistic structure representations. To be published at NAACL 2022 as "Linguistic Frameworks Go Toe-to-Toe at Neuro-Symbolic Language Modeling" by Jakob Prange, Nathan Schneider, and Lingpeng Kong.
 
 To install dependencies, run:
 `pip install -r requirements.txt`
