@@ -17,14 +17,13 @@ argp = ArgumentParser('Train a model.')
 argp.add_argument('formalism', type=str, help='Linguistic formalism; must match a training and validation .mrp file in DATA.')
 argp.add_argument('epochs', type=int, help='How many epochs to train for.')
 argp.add_argument('train_mode', type=int, help='0: graph, 1: lm, 2: both, 3: combined, '
-                                               '4: graph (combined sanity), 5: lm (combined sanity), '
-                                               '6: multitask, 7: multitask without auto graph at test time')
+                                               '4: graph (combined sanity), 5: lm (combined sanity)')
 argp.add_argument('from_scratch', type=str2bool, help='Whether or not to train the Transformer language model (GPT-2) from scratch.')
 argp.add_argument('per_l', type=str2bool, help='Whether or not to permute edge labels in the input.')
 argp.add_argument('per_a', type=str2bool, help='Whether or not to permute token-to-node anchoring in the input.')
 argp.add_argument('keep_una', type=str2bool, help='Whether or not to retain unanalyzable (multi-word) anchors when permuting token anchoring (does nothing if PER_A=0).')
 argp.add_argument('lm_weight', type=float, help='Weight of LM-finetuning-only loss in addition to ensemble-LM loss.')
-argp.add_argument('aux_weight', type=float, help='Weight of MTL auxiliary loss in addition to ensemble-LM loss.')
+argp.add_argument('aux_weight', type=float, help='Weight of MTL auxiliary loss in addition to ensemble-LM loss. (Not implemented)')
 argp.add_argument('nslm_no_tokens', type=str2bool, help='Whether or not to remove tokens from linguistic graph inputs.')
 argp.add_argument('seed', type=int, help='Seed for random model and data shuffling initialization.')
 

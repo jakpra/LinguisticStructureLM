@@ -13,7 +13,8 @@ gcn_result = namedtuple('graph_result', ['logits', 'loss', 'last_hidden_state', 
 reg_result = namedtuple('reg_result', ['logits', 'aux_loss', 'loss', 'lm_result', 'graph_result', 'aux_losses'])
 combined_result = namedtuple('combined_result', ['logits', 'loss', 'aux_loss', 'last_hidden_state', 'lm_result',
                                                  'graph_result', 'aux_losses'])
-
+mtl_result = namedtuple('mtl_result', ['logits', 'loss', 'aux_loss', 'snapshot', 'last_hidden_state', 'lm_result',
+                                       'graph_result', 'aux_losses', 'snapshot_eval'])
 
 def str2bool(v):
     if isinstance(v, bool):
