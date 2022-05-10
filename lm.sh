@@ -1,0 +1,49 @@
+FORML=$1
+EPOCHS=$2
+MODE=$3
+
+SCRATCH=$4
+MIX_LAB=$5
+MIX_ANC=$6
+KEEP_UNA=$7
+
+LM_WEIGHT=$8
+AUX_WEIGHT=$9
+
+NOTOK=${10}
+
+SEED=${11}
+
+BASELINE=${12}
+
+UPOS=${13}
+
+CMD="python3 train.py $FORML $EPOCHS $MODE $SCRATCH $MIX_LAB $MIX_ANC $KEEP_UNA $LM_WEIGHT $AUX_WEIGHT $NOTOK $SEED --baseline-enc $BASELINE --upos-file $UPOS"
+
+JOB_NAME="lm-$FORML-$MODE-$SCRATCH$MIX_LAB$MIX_ANC$KEEP_UNA-$LM_WEIGHT$AUX_WEIGHT-$NOTOK-$SEED$BASELINE"
+CMMND="$FORML-$MODE-$SCRATCH$MIX_LAB$MIX_ANC$KEEP_UNA-$LM_WEIGHT$AUX_WEIGHT-$NOTOK.cmd"
+OUTPUT="$FORML-$MODE-$SCRATCH$MIX_LAB$MIX_ANC$KEEP_UNA-$LM_WEIGHT$AUX_WEIGHT-$NOTOK.out"
+ERROR="$FORML-$MODE-$SCRATCH$MIX_LAB$MIX_ANC$KEEP_UNA-$LM_WEIGHT$AUX_WEIGHT-$NOTOK-$SEED$BASELINE.err"
+GRES="gpu:1"
+NTASKS="1"
+CPUS="8"
+TIME="3-00:00"
+MEM="28G"
+
+read -r -d '' SBATCH_CMD << EOM
+sbatch --job-name=$JOB_NAME
+       --output=$OUTPUT
+       --error=$ERROR
+       --gres=$GRES
+       --ntasks=$NTASKS
+       --cpus-per-task=$CPUS
+       --time=$TIME
+       --mem=$MEM
+       --wrap="$CMD"
+EOM
+
+echo "$SBATCH_CMD" | tee "$CMMND"
+
+eval $SBATCH_CMD
+
+echo "Running on" `hostname`
