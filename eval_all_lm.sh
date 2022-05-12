@@ -2,7 +2,7 @@
 SEED="14"
 
 # Combined
-sh lm_eval.sh eds,eds -10-0001-0.0_0.0-0-$SEED combined
+sh lm_eval.sh dm,dm,psd,eds,ptg,ud,ptb-phrase,ptb-func -10-0001-0.0_0.0-0-$SEED combined
 #sh lm_eval.sh dm,dm,psd,eds,ptg,ud,ptb-phrase,ptb-func -10-0001-0.0_0.0-0-$SEED combined mrp/upos.validation2.json
 #sh lm_eval.sh ptb-all,ptb-all -10-0001-0.0_0.0-0-$SEED combined mrp/upos.validation2.json
 #sh lm_eval.sh empty,empty,dm,psd,eds,ptg,ud,ptb-phrase,ptb-func -10-0001-0.0_0.0-0-$SEED combined mrp/upos.validation2.json upos mrp/upos.training.json
