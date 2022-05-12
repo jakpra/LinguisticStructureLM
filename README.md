@@ -2,7 +2,7 @@
 To be published at NAACL 2022 as ["Linguistic Frameworks Go Toe-to-Toe at Neuro-Symbolic Language Modeling"](https://arxiv.org/abs/2112.07874) by Jakob Prange, Nathan Schneider, and Lingpeng Kong.
 
 Please cite as:
-`
+```
 @inproceedings{prange-etal-2022-linguistic,
     title = "Linguistic Frameworks Go Toe-to-Toe at Neuro-symbolic Language Modeling",
     author = "Prange, Jakob and
@@ -16,7 +16,7 @@ Please cite as:
     url = "https://arxiv.org/abs/2112.07874",
     notes = "arxiv preprint: 2112.07874"
 }
-`
+```
 
 To install dependencies, run:
 `pip install -r requirements.txt`
