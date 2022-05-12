@@ -13,7 +13,7 @@ from graphmlp import auto_data_loop
 from read_mrp import read_mrp_file, DUMMY_LABEL, INV_LABEL, UNA_LABEL
 from util import Dir, get_capacities, str2bool
 
-argp = ArgumentParser('Train a model.')
+argp = ArgumentParser()
 argp.add_argument('formalism', type=str, help='Linguistic formalism; must match a training and validation .mrp file in DATA.')
 argp.add_argument('epochs', type=int, help='How many epochs to train for.')
 argp.add_argument('train_mode', type=int, help='0: graph, 1: lm, 2: both, 3: combined, '
@@ -189,11 +189,11 @@ elif args.train_mode == 1:
 
 checkpoint_name = 'checkpoint.pt'
 if args.train_mode in (0, 1, 2):
-    checkpoint_name = f'SemanticGraphToText/{args.formalism}_model-{args.epochs}-{int(args.from_scratch)}{int(args.per_l)}{int(args.per_a)}{int(args.keep_una)}-{int(args.nslm_no_tokens)}-{args.seed}{args.baseline_enc or ""}.pt'
+    checkpoint_name = f'{args.formalism}_model-{args.epochs}-{int(args.from_scratch)}{int(args.per_l)}{int(args.per_a)}{int(args.keep_una)}-{int(args.nslm_no_tokens)}-{args.seed}{args.baseline_enc or ""}.pt'
 if args.train_mode in (3, 4, 5):
-    checkpoint_name = f'SemanticGraphToText/{args.formalism}_combined_model-{args.epochs}{({4: "gm", 5: "lm"}[args.train_mode]) if args.train_mode in (4, 5) else ""}-{int(args.from_scratch)}{int(args.per_l)}{int(args.per_a)}{int(args.keep_una)}-{args.lm_weight}_{args.aux_weight}-{int(args.nslm_no_tokens)}-{args.seed}{args.baseline_enc or ""}.pt'
+    checkpoint_name = f'{args.formalism}_combined_model-{args.epochs}{({4: "gm", 5: "lm"}[args.train_mode]) if args.train_mode in (4, 5) else ""}-{int(args.from_scratch)}{int(args.per_l)}{int(args.per_a)}{int(args.keep_una)}-{args.lm_weight}_{args.aux_weight}-{int(args.nslm_no_tokens)}-{args.seed}{args.baseline_enc or ""}.pt'
 if args.train_mode in (6, 7):
-    checkpoint_name = f'SemanticGraphToText/{args.formalism}_multitask_model-{args.epochs}{"lm" if args.train_mode == 7 else ""}-{int(args.from_scratch)}{int(args.per_l)}{int(args.per_a)}{int(args.keep_una)}-{args.lm_weight}_{args.aux_weight}-{int(args.nslm_no_tokens)}-{args.seed}.pt'
+    checkpoint_name = f'{args.formalism}_multitask_model-{args.epochs}{"lm" if args.train_mode == 7 else ""}-{int(args.from_scratch)}{int(args.per_l)}{int(args.per_a)}{int(args.keep_una)}-{args.lm_weight}_{args.aux_weight}-{int(args.nslm_no_tokens)}-{args.seed}.pt'
 
 loaded = None
 try:

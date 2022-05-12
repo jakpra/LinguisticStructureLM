@@ -2,4 +2,5 @@ torch==1.8.1
 transformers==4.7.0
 dgl==0.6.1
 tqdm>=4.0.0
-
+numpy==1.18.1
+network2tikz

@@ -19,6 +19,9 @@ from util import Dir, get_capacities
 from evaluation import eval_combined, get_all_structure_stats, approx_rand_significance
 
 
+torch.use_deterministic_algorithms(True)
+#torch.set_deterministic_debug_mode(1)
+
 SYN_SEM = {
     'ud': 'syntax',
     'ptb-phrase': 'syntax',
@@ -44,16 +47,34 @@ DEP_CON = {
 }
 
 
-argp = ArgumentParser('Train a model.')
+argp = ArgumentParser()
 argp.add_argument('formalisms', type=str, help='Comma-separated list of linguistic formalisms; each must match a training and validation .mrp file in DATA.')
 argp.add_argument('tags', type=str, help='Comma-separated list of config tags, each following the format -EPOCHS-FLAGS[-WEIGHTS[-TOKENFLAG]]-SEED where EPOCHS is the number of epochs, FLAGS is a sequence of 4 bits corresponding to FROM_SCRATCH, PER_L, PER_A, and KEEP_UNA in train.py, WEIGHTS is LMWEIGHT_AUXWEIGHT (train.py), and TOKENFLAG is NSLM_NO_TOKENS (train.py).')
 argp.add_argument('models', type=str, help='Comma-separated list of model types (combined, graph, lm)')
-argp.add_argument('eval_upos_file', type=str, help='Analyzes performance breakdown by UPOS if .mrp file is provided.')
 
-argp.add_argument('--baseline_enc', type=str, choices=['gcn', 'rgcn', 'gat'], default=None, help='Which variant of graph neural net baseline to use, if any.')
+argp.add_argument('--eval-upos-file', type=str, default=None, help='Analyzes performance breakdown by UPOS if .mrp file is provided.')
+argp.add_argument('--baseline-enc', type=str, choices=['gcn', 'rgcn', 'gat'], default=None, help='Which variant of graph neural net baseline to use, if any.')
 argp.add_argument('--train-upos-file', type=str, default=None, help='Performs comparison-by-combination with UPOS if .mrp file is provided.')
 
-args = argp.parse_args()
+args = sys.argv[1:]
+clean_args = []
+tags = None
+for i, arg in enumerate(args):
+    if arg.startswith('-'):
+        if i == 1:
+            tags = arg
+            clean_args.append(arg.strip('-'))
+        elif i > 2:
+            clean_args.append(arg)
+        else:
+            raise Exception(f'encountered unexpected dash arg at position {i+1}: {arg}')
+    else:
+        clean_args.append(arg)
+
+args = argp.parse_args(clean_args)
+args.tags = tags
+
+
 
 formalisms = args.formalisms.split(',')
 _tags = []
@@ -77,8 +98,10 @@ for t in tags:
         raise ValueError
     _tags.append((weights, from_scratch, per_l, per_a, keep_una, epochs, seed))
 
-with open(args.eval_upos_file) as f:
-    eval_upos = json.load(f)
+eval_upos = None
+if args.eval_upos_file:
+    with open(args.eval_upos_file) as f:
+        eval_upos = json.load(f)
 
 input_upos = False
 train_upos = None
@@ -228,7 +251,7 @@ for formalism in formalisms:
         if args.models is None or 'graph' in args.models:
             loaded = None
             try:
-                model_file = f'SemanticGraphToText/{formalism}_graph_model{tag}{args.baseline_enc or ""}.pt'
+                model_file = f'{formalism}_graph_model{tag}{args.baseline_enc or ""}.pt'
                 loaded = torch.load(model_file, map_location='cpu')
             except:
                 model_file = last_known_working.get('graph')
@@ -251,7 +274,7 @@ for formalism in formalisms:
         if args.models is None or 'lm' in args.models:
             loaded = None
             try:
-                model_file = f'SemanticGraphToText/{formalism}_lm_model{tag}.pt'
+                model_file = f'{formalism}_lm_model{tag}.pt'
                 loaded = torch.load(model_file, map_location='cpu')
             except:
                 model_file = last_known_working.get('lm')
@@ -301,7 +324,7 @@ for formalism in formalisms:
         if args.models is None or 'combined' in args.models:
             loaded = None
             combined_lm = lm.CombinedLM(gpt2, mlp, use_lm=not epochs.endswith('gm'), use_graph=not epochs.endswith('lm'))
-            model_file = f'SemanticGraphToText/{formalism}_combined_model{tag}{args.baseline_enc or ""}.pt'
+            model_file = f'{formalism}_combined_model{tag}{args.baseline_enc or ""}.pt'
             try:
                 loaded = torch.load(model_file, map_location='cpu')
             except:

@@ -1,38 +1,61 @@
 FORML=$1
 TAG=$2
 MODL=$3
-UPOS=$4
-BASELINE=$5
-INPUT_UPOS=$6
 
-CMD="python3 eval.py $FORML $TAG $MODL $UPOS --baseline-enc $BASELINE --train-upos-file $INPUT_UPOS"
+if [ -z "$4" ]
+then
+    UPOS=""
+else
+    UPOS="--eval-upos-file $4"
+fi
+
+if [ -z "$5" ]
+then
+    BASELINE=""
+else
+    BASELINE="--baseline-enc $5"
+fi
+
+if [ -z "$6" ]
+then
+    INPUT_UPOS=""
+else
+    INPUT_UPOS="--train-upos-file $6"
+fi
+
+CMD="python3 eval.py $FORML $TAG $MODL $UPOS $BASELINE $INPUT_UPOS"
 
 FORML=$(echo $FORML | sed -r 's/(,?)uos\/([^,]*)/\1\2/g')
 
-JOB_NAME="lm-eval-$FORML$TAG$MODL-$BASELINE"
-CMMND="eval-$FORML$TAG$MODL$BASELINE.cmd"
-OUTPUT="eval-$FORML$TAG$MODL$BASELINE.out"
-ERROR="eval-$FORML$TAG$MODL$BASELINE.err"
+JOB_NAME="lm-eval-$FORML$TAG$MODL-$5"
+CMMND="eval-$FORML$TAG$MODL$5.cmd"
+OUTPUT="eval-$FORML$TAG$MODL$5.out"
+ERROR="eval-$FORML$TAG$MODL$5.err"
 GRES="--gres=gpu:1"
 NTASKS="1"
 CPUS="8"
 TIME="500:00"
 MEM="24G"
 
-read -r -d '' SBATCH_CMD << EOM
-sbatch --job-name=$JOB_NAME
-       --output=$OUTPUT
-       --error=$ERROR
-       $GRES
-       --ntasks=$NTASKS
-       --cpus-per-task=$CPUS
-       --time=$TIME
-       --mem=$MEM
-       --wrap="$CMD"
-EOM
+read -r SBATCH_CMD << EOL
+sbatch \
+--job-name=$JOB_NAME \
+--output=$OUTPUT \
+--error=$ERROR \
+$GRES \
+--ntasks=$NTASKS \
+--cpus-per-task=$CPUS \
+--time=$TIME \
+--mem=$MEM \
+--wrap="$CMD"
+EOL
 
 echo "$SBATCH_CMD" | tee "$CMMND"
 
-eval $SBATCH_CMD
-
-echo "Running on" `hostname`
+{
+    eval $SBATCH_CMD &&
+    echo "Running on" `hostname`
+} || {
+    echo "slurm not found; running in shell instead..."
+    eval $CMD > $OUTPUT 2> $ERROR
+}
