@@ -22,7 +22,7 @@ Please cite as:
 1. To install dependencies, run:
 `pip install -r requirements.txt`
 2. Download the [trained models](https://drive.google.com/drive/folders/1U1uvIgkVLS-kBrkRPPGE7iywpY7W9Yx_?usp=sharing) into this directory.
-3. Obtain annotated data and store all training and evaluation files as `FORMALISM.training.mrp` and `FORMALISM.validation.mrp` in a directory called `mrp/` which is a subdirectory of this one. Note: We used the annotated and [MRP](http://mrp.nlpl.eu/2020/index.php)-formatted WSJ data, so we cannot publicly release it here. Please [contact me](https://prange.jakob.georgetown.domains/) or open an issue! (You'll probably need an LDC license to get the data.)
+3. Obtain annotated data and store all training and evaluation files as `FORMALISM.training.mrp` and `FORMALISM.validation.mrp` (where `FORMALISM` is one of `{dm, psd, eds, ptg, ud, ptb-phrase, ptb-func, empty}`) in a directory called `mrp/` which is a subdirectory of this one. Note: We used the annotated and [MRP](http://mrp.nlpl.eu/2020/index.php)-formatted WSJ data, so we cannot publicly release it here. Please [contact me](https://prange.jakob.georgetown.domains/) or open an issue! (You'll probably need an LDC license to get the data.)
 
 ## Reproduce Paper Results
 To reproduce the main results (table 2 in the paper), complete the following steps:
