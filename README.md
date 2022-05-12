@@ -33,7 +33,7 @@ To reproduce the main results (table 2 in the paper), complete the following ste
 
 ## Other Usage
 To get more info on commandline arguments, run:
-`python3 train.py` or `python eval.py`
+`python3 train.py` or `python3 eval.py`
 
 To evaluate a trained model more generally (might require additional input file; contact me!), edit `lm_eval.sh` to match your environment and directory structure, uncomment the lines you want in `eval_all_lm.sh` and run:
 `sh eval_all_lm.sh SEED` where `SEED` is the last number before `.pt` in the model name (currently only seed=14 models are available for download).
