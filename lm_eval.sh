@@ -25,8 +25,6 @@ fi
 
 CMD="python3 eval.py $FORML $TAG $MODL $UPOS $BASELINE $INPUT_UPOS"
 
-FORML=$(echo $FORML | sed -r 's/(,?)uos\/([^,]*)/\1\2/g')
-
 JOB_NAME="lm-eval-$FORML$TAG$MODL-$5"
 CMMND="eval-$FORML$TAG$MODL$5.cmd"
 OUTPUT="eval-$FORML$TAG$MODL$5.out"
