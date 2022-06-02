@@ -29,7 +29,7 @@ To reproduce the main results (table 2 in the paper), complete the following ste
 1. Edit `lm_eval.sh` to match your local environment
 2. Run: `sh eval_all_lm.sh`
 3. The results will be written to `stdout` by the eval.py, which will be collected in a file called `eval-dm,dm,psd,eds,ptg,ud,ptb-phrase,ptb-func-10-0001-0.0_0.0-0-14combined.out` by lm_eval.sh.
-Run: `cat eval-dm,dm,psd,ptg,eds,ud,ptb-phrase,ptb-func-10-0001-0.0_0.0-0-14combined.out | grep ";all;" | grep gold`, which will give you a bunch of semicolon-separated lines you can paste into your favorite spreadsheet. Voila!
+Run: `cat eval-dm,dm,psd,eds,ptg,ud,ptb-phrase,ptb-func-10-0001-0.0_0.0-0-14combined.out | grep ";all;" | grep gold`, which will give you a bunch of semicolon-separated lines you can paste into your favorite spreadsheet. Voila!
 
 ## Other Usage
 To get more info on commandline arguments, run:
