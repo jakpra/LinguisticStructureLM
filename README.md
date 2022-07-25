@@ -1,5 +1,5 @@
 # LinguisticStructureLM: Transformer-based Language Modeling with Symbolic Linguistic Structure Representations
-To be published at NAACL 2022 as ["Linguistic Frameworks Go Toe-to-Toe at Neuro-Symbolic Language Modeling"](https://aclanthology.org/2022.naacl-main.325/) by Jakob Prange, Nathan Schneider, and Lingpeng Kong.
+Published at NAACL-HLT 2022 as ["Linguistic Frameworks Go Toe-to-Toe at Neuro-Symbolic Language Modeling"](https://aclanthology.org/2022.naacl-main.325/) by Jakob Prange, Nathan Schneider, and Lingpeng Kong.
 
 Please cite as:
 ```
