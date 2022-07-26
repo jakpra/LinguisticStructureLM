@@ -2,6 +2,7 @@ import sys
 from collections import defaultdict
 import itertools
 import json
+import copy
 
 import datetime
 from argparse import ArgumentParser
@@ -19,8 +20,12 @@ from util import Dir, get_capacities
 from evaluation import eval_combined, get_all_structure_stats, approx_rand_significance
 
 
-torch.use_deterministic_algorithms(True)
-#torch.set_deterministic_debug_mode(1)
+# torch.use_deterministic_algorithms(True)
+# #torch.set_deterministic_debug_mode(1)
+# if torch.backends.cudnn.is_available():
+#     print('cuDNN ok')
+#     torch.backends.cudnn.determinism = True
+# print('Determinism is switched', 'ON' if torch.are_deterministic_algorithms_enabled() else 'OFF')
 
 SYN_SEM = {
     'ud': 'syntax',
@@ -240,7 +245,7 @@ for formalism in formalisms:
                                                                        index_pos=len(upos_types) if input_upos else 0)
         feat_dim = sum(capacity_sizes)
 
-        mlp = graphmlp.EmbeddingGraphMLP(graph_in_dim or feat_dim, 1024, [768], tokenizer, encoder, emb_param, dropout=0.2)
+        mlp = graphmlp.EmbeddingGraphMLP(graph_in_dim or feat_dim, 1024, [768], tokenizer, encoder, copy.deepcopy(emb_param), dropout=0.2)
 
         graph_all_params = sum([p.numel() for p in mlp.parameters()])
         graph_grad_params = sum([p.numel() for p in mlp.parameters() if p.requires_grad])
@@ -292,7 +297,7 @@ for formalism in formalisms:
                     last_known_working['lm'] = model_file
 
         if args.models is None or 'lm' in args.models or 'graph' in args.models:
-            reg_lm = lm.RegularizedLM(gpt2, mlp)
+            reg_lm = lm.RegularizedLM(copy.deepcopy(gpt2), copy.deepcopy(mlp))
             if device == 'cuda':
                 reg_lm.cuda()
             reg_lm.eval()
@@ -304,7 +309,7 @@ for formalism in formalisms:
                                       upos=eval_upos if input_upos else None, upos_types=upos_types if input_upos else None,
                                       encode_incremental=0,
                                       device=device,
-                                      embedding=inp_emb,
+                                      embedding=copy.deepcopy(inp_emb),
                                       return_first_idxs=True,
                                       write_cache=False,
                                       max_una=max_una,
@@ -323,7 +328,7 @@ for formalism in formalisms:
 
         if args.models is None or 'combined' in args.models:
             loaded = None
-            combined_lm = lm.CombinedLM(gpt2, mlp, use_lm=not epochs.endswith('gm'), use_graph=not epochs.endswith('lm'))
+            combined_lm = lm.CombinedLM(copy.deepcopy(gpt2), copy.deepcopy(mlp), use_lm=not epochs.endswith('gm'), use_graph=not epochs.endswith('lm'))
             model_file = f'{formalism}_combined_model{tag}{args.baseline_enc or ""}.pt'
             try:
                 loaded = torch.load(model_file, map_location='cpu')
@@ -359,7 +364,7 @@ for formalism in formalisms:
                                       upos=eval_upos if input_upos else None, upos_types=upos_types if input_upos else None,
                                       encode_incremental=0,
                                       device=device,
-                                      embedding=inp_emb,
+                                      embedding=copy.deepcopy(inp_emb),
                                       return_first_idxs=True,
                                       write_cache=False,
                                       max_una=max_una, sibling_dir=sibling_dir)
