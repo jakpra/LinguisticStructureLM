@@ -204,7 +204,7 @@ def train(model, data, dev_data=None, n_data=None, randomize=True, checkpoint_na
 
                         token_idxs = torch.gather(l_batch, 1, token_batch)
                         token_embs = model.embedder(token_idxs)
-                        emb_mask = get_batch_seq_mask(bs, sl).to(token_embs).view(bs * sl, -1)
+                        emb_mask = get_batch_seq_mask(bs, sl).to(token_embs)
 
                         batch_loss, reconstructed, hi_res_loss, lo_res_loss, emb_loss = \
                             model.graph_snapshot_reconstruct_and_loss(decoded_slice.view(bs * sl, d),
@@ -229,11 +229,21 @@ def train(model, data, dev_data=None, n_data=None, randomize=True, checkpoint_na
                     model.eval()
                     dev_loss = 0
                     n = 0
-                    for _, x_batch, _, _, _ in dev_data:
+                    for _, x_batch, l_batch, token_batch, _ in dev_data:
                         encoded_hidden = model.encode_slice(x_batch)
                         decoded_slice = model.decode_hidden(encoded_hidden)
+                        assert x_batch.shape == decoded_slice.shape
+                        bs, sl, d = x_batch.shape
+
+                        token_idxs = torch.gather(l_batch, 1, token_batch)
+                        token_embs = model.embedder(token_idxs)
+                        emb_mask = get_batch_seq_mask(bs, sl).to(token_embs)
+
                         batch_loss, reconstructed, hi_res_loss, lo_res_loss, emb_loss = \
-                            model.graph_snapshot_reconstruct_and_loss(decoded_slice, struct_tgt=x_batch)
+                            model.graph_snapshot_reconstruct_and_loss(decoded_slice.view(bs * sl, d),
+                                                                      token_embs.view(bs * sl, -1),
+                                                                      emb_mask.view(bs * sl, -1),
+                                                                      struct_tgt=x_batch.view(bs*sl, d).detach())
                         del x_batch
                         n += 1
                         dev_loss += batch_loss.detach()
