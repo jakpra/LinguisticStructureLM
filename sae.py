@@ -204,7 +204,7 @@ def train(model, data, dev_data=None, n_data=None, randomize=True, checkpoint_na
 
                         token_idxs = torch.gather(l_batch, 1, token_batch)
                         token_embs = model.embedder(token_idxs)
-                        emb_mask = get_batch_seq_mask(bs, sl).view(bs * sl, -1)
+                        emb_mask = get_batch_seq_mask(bs, sl).to(token_embs).view(bs * sl, -1)
 
                         batch_loss, reconstructed, hi_res_loss, lo_res_loss, emb_loss = \
                             model.graph_snapshot_reconstruct_and_loss(decoded_slice.view(bs * sl, d),
