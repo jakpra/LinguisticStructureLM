@@ -162,7 +162,7 @@ class SliceAutoEncoder(GraphMLP):
             hi_res_loss = softmax_loss(softmaxes, softmax_tgts)       #  * softmaxes[0].size(-1)
             lo_res_loss = logit_sigmoid_loss(sigmoids, sigmoid_tgts)  # * sigmoids[0].size(-1)
             # emb_loss = sigmoid_loss(emb_sigmoids, emb_sigmoid_tgts)   # * emb_sigmoids[0].size(-1)
-            emb_loss = cosine_loss(embs, emb_tgts, 1)
+            emb_loss = cosine_loss(embs, emb_tgts, torch.ones(embs.size(0)))
             loss = softmax_weight * label_weight * hi_res_loss + \
                    sigmoid_weight * label_weight * sigmoids[0].size(-1) * lo_res_loss + \
                    sigmoid_weight * emb_weight * embs[0].size(-1) * emb_loss
