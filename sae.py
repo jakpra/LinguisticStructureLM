@@ -225,10 +225,10 @@ def train(model, data, dev_data=None, n_data=None, randomize=True, checkpoint_na
                             total_pbar.update(1 / n_data)
                         torch.cuda.empty_cache()
 
+                dev_loss = 0
                 if dev_data is not None:
                     model.eval()
-                    dev_loss = 0
-                    n = 0
+                    dev_n = 0
                     for _, x_batch, l_batch, token_batch, _ in dev_data:
                         encoded_hidden = model.encode_slice(x_batch)
                         decoded_slice = model.decode_hidden(encoded_hidden)
@@ -245,15 +245,17 @@ def train(model, data, dev_data=None, n_data=None, randomize=True, checkpoint_na
                                                                       emb_mask.view(bs * sl, -1),
                                                                       struct_tgt=x_batch.view(bs*sl, d).detach())
                         del x_batch
-                        n += 1
+                        dev_n += 1
                         dev_loss += batch_loss.detach()
 
-                    dev_loss /= n
-                    if dev_loss < best_dev_loss:
+                    dev_loss = dev_loss.item() / dev_n
+
+                if dev_loss < best_dev_loss:
+                    if dev_data is not None:
                         best_dev_loss = dev_loss
-                        print('saving checkpoint at epoch', i, 'with best loss', dev_loss)
+                    print('saving checkpoint at epoch', i, 'with best loss', dev_loss, '(dev)', loss.item() / n, '(train)')
 
-                        with open(checkpoint_name, 'wb') as f:
-                            torch.save(model.state_dict(), f)
+                    with open(checkpoint_name, 'wb') as f:
+                        torch.save(model.state_dict(), f)
 
-                    model.train()
+                model.train()

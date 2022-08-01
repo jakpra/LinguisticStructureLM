@@ -184,7 +184,7 @@ if loaded is not None:
 
 
 sae.train(model, data, dev_data=dev_data, epochs=args.epochs, n_data=((len(data) // batch_size) + 1), randomize=True,
-         seed=args.seed, checkpoint_name=checkpoint_name, lr=1e-4)
+          seed=args.seed, checkpoint_name=checkpoint_name, lr=1e-4)
 
 
 model.eval()
