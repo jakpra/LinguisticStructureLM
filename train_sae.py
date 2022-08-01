@@ -135,7 +135,7 @@ elif args.baseline_enc == 'gat':
 else:
     encoder = graphmlp.SparseSliceEncoder(**kwargs)  # TODO: add an out_dim to SparseSliceEncoder to unify this
 
-model = sae.SliceAutoEncoder(feat_dim, 1024, [768], encoder, dropout=0.2)
+model = sae.SliceAutoEncoder(feat_dim, 1024, [768], capacity_sizes, capacity_types, encoder, dropout=0.2)
 
 if device == 'cuda':
     model.cuda()

@@ -9,7 +9,7 @@ from evaluation import eval_combined
 
 
 class SliceAutoEncoder(GraphMLP):
-    def __init__(self, in_dim, h_dim1, h_dims, encoder, dropout=0.2):
+    def __init__(self, in_dim, h_dim1, h_dims, capacity_sizes, capacity_types, encoder, dropout=0.2):
         super(GraphMLP, self).__init__()
         self.encoder = encoder
         self.hidden1 = torch.nn.Linear(in_dim, h_dim1)
@@ -28,6 +28,9 @@ class SliceAutoEncoder(GraphMLP):
             rhr.weight = torch.nn.Parameter(h.weight.t())
             self.reverse_hiddens_residual.append(rhr)
             self.decoder_hiddens.append(torch.nn.Linear(o, i))
+
+        self.capacity_sizes = capacity_sizes
+        self.capacity_types = capacity_types
 
         self.activation = torch.nn.ReLU()
         self.dropout = torch.nn.Dropout(dropout)
