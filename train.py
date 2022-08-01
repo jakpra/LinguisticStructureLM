@@ -149,7 +149,7 @@ d = d[:train_dev_split]
 
 data = auto_data_loop(graphmlp.raw_data_loop, d, edge_labels, tokenizer, encoder,
                       upos=upos, upos_types=upos_types,
-                      encode_incremental=0,  # to speed up training, GNN baselines are only run once per sentence
+                      encode_incremental=0,  # (set to 0 to speed up training, so that GNN baselines are only run once per sentence. in case of memory issues, set to >0 (the smaller, the slower and less memory used)
                       device=device,
                       embedding=inp_emb,
                       batch_size=batch_size, write_cache=False,
@@ -158,7 +158,7 @@ data = auto_data_loop(graphmlp.raw_data_loop, d, edge_labels, tokenizer, encoder
 
 dev_data = auto_data_loop(graphmlp.raw_data_loop, dev_d, edge_labels, tokenizer, encoder,
                           upos=upos, upos_types=upos_types,
-                          encode_incremental=0,  # to speed up training, GNN baselines are only run once per sentence
+                          encode_incremental=0,  # (0) to speed up training, GNN baselines are only run once per sentence
                           device=device,
                           embedding=inp_emb,
                           batch_size=1, write_cache=False,

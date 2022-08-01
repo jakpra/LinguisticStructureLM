@@ -325,6 +325,7 @@ def train(model, data, dev_data=None, n_data=None, randomize=True, train_mode=3,
                                               c=0)
                                               # c=1 -> gold graphs only (teacher forcing)
                                               # c=0 -> auto graphs only
+                        del x_batch, l_batch, token_batch
                         n += 1
                         loss += model_outputs.loss
                         batch_loss = model_outputs.loss  # / batch_n
@@ -334,15 +335,18 @@ def train(model, data, dev_data=None, n_data=None, randomize=True, train_mode=3,
                                                lm_loss=model_outputs.lm_result.loss.item(),
                                                g_loss=model_outputs.graph_result.loss.item(),
                                                pr_loss=model_outputs.aux_loss.item())
-                        pbar.set_postfix(total_loss=loss.item() / n)
+                        pbar.set_postfix(total_loss=loss.item() / n, mem='{:.1f} MiB'.format(torch.cuda.max_memory_allocated() / 1000000))
                         if n_data is not None:
                             total_pbar.update(1 / n_data)
+                        del model_outputs
+                        torch.cuda.empty_cache()
 
                 if dev_data is not None:
                     model.eval()
                     domains = defaultdict(str)
                     dev_eval, _ = eval_combined(model, model.tokenizer, dev_data, domains, interesting_n=1,
                                                 device=next(model.parameters()).device)
+                    torch.cuda.empty_cache()
                     print()
                     for m in ('gold2', 'auto2', 'lm2'):
                         for p in ('ppl', 'acc'):

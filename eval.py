@@ -245,7 +245,7 @@ for formalism in formalisms:
                                                                        index_pos=len(upos_types) if input_upos else 0)
         feat_dim = sum(capacity_sizes)
 
-        mlp = graphmlp.EmbeddingGraphMLP(graph_in_dim or feat_dim, 1024, [768], tokenizer, encoder, copy.deepcopy(emb_param), dropout=0.2)
+        mlp = graphmlp.EmbeddingGraphMLP(graph_in_dim or feat_dim, 1024, [768], tokenizer, encoder, emb_param, dropout=0.2)
 
         graph_all_params = sum([p.numel() for p in mlp.parameters()])
         graph_grad_params = sum([p.numel() for p in mlp.parameters() if p.requires_grad])
@@ -301,10 +301,10 @@ for formalism in formalisms:
             if device == 'cuda':
                 reg_lm.cuda()
             reg_lm.eval()
-            embedding = gpt2.get_input_embeddings()
+            embedding = reg_lm.pretrained_lm.get_input_embeddings()
             inp_emb = None if nslm_no_tokens else torch.nn.Embedding.from_pretrained(embedding.weight.cpu())
 
-            val_data = auto_data_loop(graphmlp.raw_data_loop, val_d, edge_labels, tokenizer, encoder,
+            val_data = auto_data_loop(graphmlp.raw_data_loop, val_d, edge_labels, tokenizer, reg_lm.graph_model.encoder,
                                       batch_size=val_batch_size,
                                       upos=eval_upos if input_upos else None, upos_types=upos_types if input_upos else None,
                                       encode_incremental=0,
@@ -315,7 +315,7 @@ for formalism in formalisms:
                                       max_una=max_una,
                                       sibling_dir=sibling_dir)
             evals, _ = eval_combined(reg_lm, tokenizer, val_data, val_domains,
-                                  interesting_n=interesting_n, ud_upos=eval_upos, device=device)
+                                     interesting_n=interesting_n, ud_upos=eval_upos, device=device)
             if args.models is not None and ('lm' not in args.models or 'graph' not in args.models):
                 dmns = list(evals.keys())
                 for dmn in dmns:
@@ -357,9 +357,9 @@ for formalism in formalisms:
             print('cm grad', cm_grad_params)
 
             other_evals['combined'] = {'params': cm_grad_params}
-            embedding = gpt2.get_input_embeddings()
+            embedding = combined_lm.pretrained_lm.get_input_embeddings()
             inp_emb = None if nslm_no_tokens else torch.nn.Embedding.from_pretrained(embedding.weight.cpu())
-            val_data = auto_data_loop(graphmlp.raw_data_loop, val_d, edge_labels, tokenizer, encoder,
+            val_data = auto_data_loop(graphmlp.raw_data_loop, val_d, edge_labels, tokenizer, combined_lm.graph_model.encoder,
                                       batch_size=val_batch_size,
                                       upos=eval_upos if input_upos else None, upos_types=upos_types if input_upos else None,
                                       encode_incremental=0,

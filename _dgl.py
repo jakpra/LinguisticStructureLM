@@ -1,4 +1,5 @@
 import sys
+import copy
 
 import torch
 import torch.nn.functional as F
@@ -36,7 +37,7 @@ class GNN(torch.nn.Module):
             self.lab_projector = torch.nn.Linear(self.n_labels, self.h_dim)
         if gnn_class == RelGraphConv:
             args['num_rels'] = 2 * self.n_labels  # * 2 to account for inverses
-            args['regularizer'] = 'basis'
+            args['regularizer'] = None  # 'basis' # some bug with basis matrix reg leads to mem leak???
             args['num_bases'] = max(self.n_labels // 5, 1)  # equiv to 10% of the original label set
             if max_bases is not None:
                 args['num_bases'] = min(args['num_bases'], max_bases)
