@@ -135,11 +135,11 @@ elif args.baseline_enc == 'gat':
 else:
     encoder = graphmlp.SparseSliceEncoder(**kwargs)  # TODO: add an out_dim to SparseSliceEncoder to unify this
 
-sae = sae.SliceAutoEncoder(feat_dim, 1024, [768], encoder, dropout=0.2)
+model = sae.SliceAutoEncoder(feat_dim, 1024, [768], encoder, dropout=0.2)
 
 if device == 'cuda':
-    sae.cuda()
-sae.eval()
+    model.cuda()
+model.eval()
 
 batch_size = 8
 
@@ -176,14 +176,14 @@ except:
     print('model not found.', file=sys.stderr)
 if loaded is not None:
     try:
-        sae.load_state_dict(loaded)
+        model.load_state_dict(loaded)
     except Exception as e:
         print(f'couldn\'t load model: {e}', file=sys.stderr)
 
 
-sae.train(sae, data, dev_data=dev_data, epochs=args.epochs, n_data=((len(data) // batch_size) + 1), randomize=True,
+sae.train(model, data, dev_data=dev_data, epochs=args.epochs, n_data=((len(data) // batch_size) + 1), randomize=True,
          seed=args.seed, checkpoint_name=checkpoint_name, lr=1e-4)
 
 
-sae.eval()
+model.eval()
 
