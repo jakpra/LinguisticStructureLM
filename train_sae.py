@@ -1,3 +1,4 @@
+import copy
 import sys
 import json
 import itertools
@@ -135,7 +136,8 @@ elif args.baseline_enc == 'gat':
 else:
     encoder = graphmlp.SparseSliceEncoder(**kwargs)  # TODO: add an out_dim to SparseSliceEncoder to unify this
 
-model = sae.SliceAutoEncoder(feat_dim, 1024, [768], capacity_sizes, capacity_types, encoder, dropout=0.2)
+model = sae.SliceAutoEncoder(feat_dim, 1024, [768], capacity_sizes, capacity_types, encoder, copy.deepcopy(inp_emb),
+                             dropout=0.2)
 
 if device == 'cuda':
     model.cuda()
@@ -152,7 +154,7 @@ data = auto_data_loop(graphmlp.raw_data_loop, d, edge_labels, tokenizer, encoder
                       upos=upos, upos_types=upos_types,
                       encode_incremental=0,  # (set to 0 to speed up training, so that GNN baselines are only run once per sentence. in case of memory issues, set to >0 (the smaller, the slower and less memory used)
                       device=device,
-                      embedding=inp_emb,
+                      embedding=copy.deepcopy(inp_emb),
                       batch_size=batch_size, write_cache=False,
                       max_una=max_una,
                       sibling_dir=sibling_dir)
