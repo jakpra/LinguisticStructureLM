@@ -207,9 +207,9 @@ def train(model, data, dev_data=None, n_data=None, randomize=True, checkpoint_na
                         emb_mask = get_batch_seq_mask(bs, sl).view(bs * sl, -1)
 
                         batch_loss, reconstructed, hi_res_loss, lo_res_loss, emb_loss = \
-                            model.graph_snapshot_reconstruct_and_loss(decoded_slice.view(bs*sl, d),
-                                                                      token_embs.view(bs*sl, -1),
-                                                                      emb_mask.view(-1),
+                            model.graph_snapshot_reconstruct_and_loss(decoded_slice.view(bs * sl, d),
+                                                                      token_embs.view(bs * sl, -1),
+                                                                      emb_mask.view(bs * sl, -1),
                                                                       struct_tgt=x_batch.view(bs*sl, d).detach())
                         del x_batch
                         n += 1
