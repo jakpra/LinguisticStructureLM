@@ -195,17 +195,20 @@ def train(model, data, dev_data=None, n_data=None, randomize=True, checkpoint_na
                     random.shuffle(data)
                 with tqdm.tqdm(data, total=n_data, desc=f'Epoch {i + 1}') \
                         as pbar_batch:
-                    for _, x_batch, l_batch, _ in pbar_batch:
+                    for _, x_batch, l_batch, token_batch in pbar_batch:
                         optim.zero_grad()
                         encoded_hidden = model.encode_slice(x_batch)
                         decoded_slice = model.decode_hidden(encoded_hidden)
                         assert x_batch.shape == decoded_slice.shape
                         bs, sl, d = x_batch.shape
-                        embeddings = model.embedder(l_batch)
-                        emb_mask = get_batch_seq_mask(bs, sl - 1).view(bs * (sl - 1), -1)
+
+                        token_idxs = torch.gather(l_batch, 1, token_batch)
+                        token_embs = model.embedder(token_idxs)
+                        emb_mask = get_batch_seq_mask(bs, sl).view(bs * sl, -1)
+
                         batch_loss, reconstructed, hi_res_loss, lo_res_loss, emb_loss = \
                             model.graph_snapshot_reconstruct_and_loss(decoded_slice.view(bs*sl, d),
-                                                                      embeddings.view(bs*sl, -1),
+                                                                      token_embs.view(bs*sl, -1),
                                                                       emb_mask.view(-1),
                                                                       struct_tgt=x_batch.view(bs*sl, d).detach())
                         del x_batch
